@@ -19,3 +19,4 @@ module DataMemory #(parameter REG_BITS=32)
     end
 
 endmodule
+

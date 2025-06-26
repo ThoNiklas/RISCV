@@ -24,3 +24,4 @@ module RegisterFile #( parameter REG_BITS = 32, parameter ADDR_BITS = 5)
     end
 
 endmodule
+

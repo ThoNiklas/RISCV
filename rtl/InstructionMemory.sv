@@ -10,3 +10,4 @@ module InstructionMemory #(parameter REG_BITS=32)
         rd = mem[a];
     end
 endmodule
+

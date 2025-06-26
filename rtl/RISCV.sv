@@ -21,10 +21,11 @@ module RISCV #(parameter REG_BITS=32, parameter ADDR_BITS=5)
         end
     end
 
-    //InstructionMemory #(.REG_BITS(REG_BITS)) instructionMemory(.a(pc), .rd(instrRD));
+    InstructionMemory #(.REG_BITS(REG_BITS)) instructionMemory(.a(pc), .rd(instrRD));
 
-    //RegisterFile #(.REG_BITS(REG_BITS), .ADDR_BITS(ADDR_BITS)) registerFile(.clk(clk), .rst(rst), .we3(1'b0), .a1(0), .a2(0), .a3(0), .wd3(0), .rd1(rd1), .rd2(rd2));
+    RegisterFile #(.REG_BITS(REG_BITS), .ADDR_BITS(ADDR_BITS)) registerFile(.clk(clk), .rst(rst), .we3(1'b0), .a1(0), .a2(0), .a3(0), .wd3(0), .rd1(rd1), .rd2(rd2));
 
-    //DataMemory #(.REG_BITS(REG_BITS)) dataMemory(.a(0), .wd(0), .we(0), .rd(memRD));
+    DataMemory #(.REG_BITS(REG_BITS)) dataMemory(.a(0), .wd(0), .we(0), .rd(memRD));
 
 endmodule
+
