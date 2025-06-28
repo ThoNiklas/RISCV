@@ -4,10 +4,9 @@ module InstructionMemory #(parameter REG_BITS=32)
     output logic  [REG_BITS-1:0] rd
 );
 
-    logic [REG_BITS-1:0] mem [REG_BITS-1:0];
+    reg [REG_BITS-1:0] mem [0 : 2 ** REG_BITS - 1] = '{default:0};
+    assign mem[1] = 32'b1;
 
-    always_comb begin
-        rd = mem[a];
-    end
+    assign rd = mem[a];
 endmodule
 
