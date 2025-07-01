@@ -58,6 +58,11 @@ module ALU #(parameter REG_BITS=32)
                 C = tmp[REG_BITS:1];
                 ONZC[0] = tmp[0];
            end
+           4'b1010: begin //subu
+               tmpResult = $unsigned(A) - $unsigned(B);
+               ONZC[3] = tmpResult[REG_BITS];
+               C = tmpResult[REG_BITS-1:0];
+           end
            default:
                 C = 'b0;
        endcase

@@ -78,6 +78,17 @@ module ALU_tb #(parameter REG_BITS=5)
 
        #5ns;
 
+       ctrl = 4'b1010; // subu
+       A = 5'b1100;
+       B = 5'b0001;
+
+       #5ns;
+
+       A = 5'b0001;
+       B = 5'b1000;
+       
+       #5ns;
+
    end
 
 endmodule
