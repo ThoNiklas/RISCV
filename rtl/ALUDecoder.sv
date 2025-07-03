@@ -19,13 +19,14 @@ module ALUDecoder (
                     3'b011: ALUControl = 4'b0111; // sltu
                     3'b100: ALUControl = 4'b0100; // xor
                     3'b101: begin
-                        if (OPFunct7 == 2'b01) ALUControl = 4'b1000; // srl
-                        else ALUControl = 4'b1001; // sra
+                        if (OPFunct7[0] == 1'b1) ALUControl = 4'b1001; // sra
+                        else ALUControl = 4'b1000; // srl
                     end
                     3'b110: ALUControl = 4'b0011; // or
                     3'b111: ALUControl = 4'b0010; // and
                 endcase
             end
+            2'b11: ALUControl = 4'b1010; // subu
             default: ALUControl = 4'b0000;
         endcase
     end

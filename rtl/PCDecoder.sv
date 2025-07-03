@@ -21,7 +21,7 @@ module PCDecoder (
                        if (ONZC[1] == 1'b0) PCSrc = 2'b01;
                        else PCSrc = 2'b00;
                    end
-                   3'b010: begin // blt
+                   3'b100: begin // blt
                        if (ONZC[2] == 1'b1) PCSrc = 2'b01;
                        else PCSrc = 2'b00;
                    end
