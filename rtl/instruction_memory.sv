@@ -1,12 +1,12 @@
 /* verilator lint_off UNUSEDSIGNAL */
 
-module InstructionMemory #(parameter REG_BITS=32) 
+module instruction_memory #(parameter RegBits=32) 
 (
-    input logic  [REG_BITS-1:0] A,
-    output logic  [REG_BITS-1:0] RD
+    input logic  [RegBits-1:0] a_i,
+    output logic  [RegBits-1:0] rd_o
 );
 
-    reg [REG_BITS-1:0] mem [0 : 2 ** 15 - 1];
+    reg [RegBits-1:0] mem [0 : 2 ** 15 - 1];
     initial begin
         $display("Read ROM");
         $readmemh("./mem/hex_rom.mem", mem); // load hex file
@@ -14,7 +14,7 @@ module InstructionMemory #(parameter REG_BITS=32)
 
     end
 
-    assign RD = mem[A];
+    assign rd_o = mem[a_i];
 
 endmodule
 
