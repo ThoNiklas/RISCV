@@ -8,7 +8,7 @@ module InstructionMemory #(parameter REG_BITS=32)
 
     reg [REG_BITS-1:0] mem [0 : 2 ** 15 - 1];
     initial begin
-        $display("Read Rom");
+        $display("Read ROM");
         $readmemh("./mem/hex_rom.mem", mem); // load hex file
         //$readmemb("../mem/bin_rom.mem", mem); // load bin file
 
