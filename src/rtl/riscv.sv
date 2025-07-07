@@ -1,10 +1,33 @@
+`include "config.svh"
+
 module riscv #(parameter RegBits=32, parameter AddrBits=5) 
 (
+`ifdef TB
+    input logic [RegBits-1:0] instr,
+    output logic [RegBits-1:0] pc, pc_next,
+    output logic [RegBits-1:0] write_back, register_a, register_b,
+    output logic [RegBits-1:0] source_b, alu_result,
+    output logic [3:0] alu_control, onzc,
+    output logic memory_write,
+    output logic [RegBits-1:0] read_data,
+    output logic [RegBits-1:0] result, result_extended,
+    output logic [2:0] result_extend_control,
+    output logic [RegBits-1:0] pc_plus_4, pc_target,
+    output logic [RegBits-1:0] immediate_extended,
+    output logic [2:0] immediate_source,
+    output logic [1:0] write_back_source,
+    output logic [1:0] pc_source,
+    output logic reg_write, alu_source,
+    output logic result_source,
+`endif
     input logic clk_i, rst_i
 );
 
-    logic [RegBits-1:0] pc_next, pc;
+`ifdef TB
+
+`else
     logic [RegBits-1:0] instr;
+    logic [RegBits-1:0] pc_next, pc;
     logic [RegBits-1:0] write_back, register_a, register_b;
     logic [RegBits-1:0] source_b, alu_result;
     logic [3:0] alu_control, onzc;
@@ -19,6 +42,8 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
     logic [1:0] pc_source;
     logic reg_write, alu_source;
     logic result_source;
+`endif
+
 
     program_counter #(.RegBits(RegBits)) program_counter (.clk_i(clk_i), 
                                                           .rst_i(rst_i), 
@@ -81,7 +106,7 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
 
     always_comb begin 
 
-        pc_plus_4 = pc + 4;
+        pc_plus_4 = pc + 4; // plus 4 bytes but plus 1 for next array entry
         pc_target = pc + immediate_extended;
 
         case(pc_source)

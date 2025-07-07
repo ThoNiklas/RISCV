@@ -6,7 +6,8 @@ module instruction_memory #(parameter RegBits=32)
     output logic  [RegBits-1:0] rd_o
 );
 
-    reg [RegBits-1:0] mem [0 : 2 ** 15 - 1];
+    //reg [RegBits-1:0] mem [0 : 2 ** 15 - 1];
+    reg [7 : 0] mem [2 ** 15 - 1:0];
     initial begin
         $display("Read ROM");
         $readmemh("./mem/hex_rom.mem", mem); // load hex file
@@ -14,7 +15,7 @@ module instruction_memory #(parameter RegBits=32)
 
     end
 
-    assign rd_o = mem[a_i];
+    assign rd_o = {mem[a_i], mem[a_i+1], mem[a_i+2], mem[a_i+3]};
 
 endmodule
 
