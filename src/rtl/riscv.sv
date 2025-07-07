@@ -3,22 +3,22 @@
 module riscv #(parameter RegBits=32, parameter AddrBits=5) 
 (
 `ifdef TB
-    input logic [RegBits-1:0] instr,
-    output logic [RegBits-1:0] pc, pc_next,
-    output logic [RegBits-1:0] write_back, register_a, register_b,
-    output logic [RegBits-1:0] source_b, alu_result,
-    output logic [3:0] alu_control, onzc,
-    output logic memory_write,
-    output logic [RegBits-1:0] read_data,
-    output logic [RegBits-1:0] result, result_extended,
-    output logic [2:0] result_extend_control,
-    output logic [RegBits-1:0] pc_plus_4, pc_target,
-    output logic [RegBits-1:0] immediate_extended,
-    output logic [2:0] immediate_source,
-    output logic [1:0] write_back_source,
-    output logic [1:0] pc_source,
-    output logic reg_write, alu_source,
-    output logic result_source,
+    input logic [RegBits-1:0] instr_i,
+    output logic [RegBits-1:0] pc_o, pc_next_o,
+    output logic [RegBits-1:0] write_back_o, register_a_o, register_b_o,
+    output logic [RegBits-1:0] source_b_o, alu_result_o,
+    output logic [3:0] alu_control_o, onzc_o,
+    output logic memory_write_o,
+    output logic [RegBits-1:0] read_data_o,
+    output logic [RegBits-1:0] result_o, result_extended_o,
+    output logic [2:0] result_extend_control_o,
+    output logic [RegBits-1:0] pc_plus_4_o, pc_target_o,
+    output logic [RegBits-1:0] immediate_extended_o,
+    output logic [2:0] immediate_source_o,
+    output logic [1:0] write_back_source_o,
+    output logic [1:0] pc_source_o,
+    output logic reg_write_o, alu_source_o,
+    output logic result_source_o,
 `endif
     input logic clk_i, rst_i
 );
