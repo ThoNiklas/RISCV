@@ -74,8 +74,11 @@ def dec_to_bin(n, bits):
 
 
 input_file_path = sys.argv[1]
+output_file_path = sys.argv[2]
 address = 0
 catch_labels(input_file_path)
+
+output_file = open(output_file_path, "w")
 
 with open(input_file_path) as input_file:
     for line in input_file:
@@ -140,3 +143,6 @@ with open(input_file_path) as input_file:
             )
         address = address + 4
         print(machine_code, len(machine_code))
+        output_file.write(machine_code + "\n")
+
+output_file.close()
