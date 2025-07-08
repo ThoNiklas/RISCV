@@ -1,6 +1,16 @@
 import sys
 
-from helpers import *
+from helpers import (
+    b_types,
+    funct3s,
+    funct7s,
+    i_types,
+    j_types,
+    opcodes,
+    r_types,
+    s_types,
+    u_types,
+)
 
 labels = {}
 
@@ -57,8 +67,12 @@ def parse_line(line):
     return (label, opcode, parameters)
 
 
-input_file_path = sys.argv[1]
+def dec_to_bin(register, fill):
+    return str(bin(register)[2:].zfill(fill))
 
+
+input_file_path = sys.argv[1]
+address = 0
 catch_labels(input_file_path)
 
 with open(input_file_path) as input_file:
@@ -67,25 +81,60 @@ with open(input_file_path) as input_file:
         if opcode is None:  # empty line
             continue
         if opcode in i_types:
-            print("i")
             machine_code = (
-                str(bin(parameters[2])[2:].zfill(12))
-                + str(bin(parameters[1])[2:].zfill(5))
-                + funct3s(opcode)
-                + str(bin(parameters[0])[2:].zfill(5))
-                + opcodes(opcode)
+                dec_to_bin(parameters[2], 12)
+                + dec_to_bin(parameters[1], 5)
+                + funct3s[opcode]
+                + dec_to_bin(parameters[0], 5)
+                + opcodes[opcode]
             )
         elif opcode in u_types:
-            print("u")
+            machine_code = (
+                dec_to_bin(parameters[1], 32)[0:20]
+                + dec_to_bin(parameters[0], 5)
+                + opcodes[opcode]
+            )
         elif opcode in s_types:
-            print("s")
+            immediate = dec_to_bin(parameters[2], 12)
+            machine_code = (
+                immediate[0:7]
+                + dec_to_bin(parameters[1], 5)
+                + dec_to_bin(parameters[0], 5)
+                + funct3s[opcode]
+                + immediate[7:12]
+                + opcodes[opcode]
+            )
         elif opcode in r_types:
-            print("r")
+            machine_code = (
+                funct7s[opcode]
+                + dec_to_bin(parameters[2], 5)
+                + dec_to_bin(parameters[1], 5)
+                + funct3s[opcode]
+                + dec_to_bin(parameters[0], 5)
+                + opcodes[opcode]
+            )
         elif opcode in b_types:
-            print("b")
+            diff = labels[parameters[2]] - address
+            immediate = dec_to_bin(diff, 13)
+            machine_code = (
+                immediate[0]
+                + immediate[2:8]
+                + dec_to_bin(parameters[1], 5)
+                + dec_to_bin(parameters[0], 5)
+                + funct3s[opcode]
+                + immediate[8:13]
+                + opcodes[opcode]
+            )
         elif opcode in j_types:
-            print("j")
-
-        binary_opcode = opcodes[opcode]
-        binary_funct3 = funct3s["sll"]
-        binary_funct7 = funct7s["sll"]
+            diff = labels[parameters[1]] - address
+            immediate = dec_to_bin(diff, 21)
+            machine_code = (
+                immediate[0]
+                + immediate[10:20]
+                + immediate[9]
+                + immediate[1:9]
+                + dec_to_bin(parameters[0], 5)
+                + opcodes[opcode]
+            )
+        address = address + 4
+        print(machine_code, len(machine_code))
