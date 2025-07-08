@@ -1,84 +1,91 @@
 import sys
 
-from helpers import (
-    b_types,
-    funct3s,
-    funct7s,
-    i_types,
-    j_types,
-    opcodes,
-    r_types,
-    s_types,
-    u_types,
-)
+from helpers import *
 
-if __name__ == "__main__":
-    input_file_path = sys.argv[1]
-    output_file_path = sys.argv[2]
+labels = {}
 
-    with open(input_file_path) as input_file:
+
+def catch_labels(file):
+    address = 0
+    with open(file) as input_file:
         for line in input_file:
-            command = line.split()
-            opcode = command[0]
-            parameters = command[1].split(",")
+            line = line.split(":")
+            if len(line) == 2:
+                labels[line[0]] = address
+            address = address + 4
+    print(labels)
 
-            if opcode in i_types:
-                registerd = parameters[0]
-                registerd = int(registerd[1:])
-                registerd = str(bin(registerd)[2:].zfill(5))
 
-                register1 = parameters[1]
-                register1 = int(register1[1:])
-                register1 = str(bin(register1)[2:].zfill(5))
+def parse_line(line):
+    line = line.replace(",", "")
+    command = line.split()
 
-                immediate = int(parameters[2])
-                immediate = str(bin(immediate)[2:].zfill(12))
+    label = None
+    opcode = None
+    parameters = ()
+    if len(command) == 0:
+        return (label, opcode, parameters)
 
-                machine_code = (
-                    immediate
-                    + register1
-                    + funct3s[opcode]
-                    + registerd
-                    + opcodes[opcode]
-                )
-            elif opcode in u_types:
-                immediate = int(parameters[1])
-                immediate = str(bin(immediate)[2:].zfill(20))
+    if command[0][-1] == ":":  # label
+        label = command[0][:-1]
+        command = command[1:]
 
-                registerd = parameters[0]
-                registerd = int(registerd[1:])
-                registerd = str(bin(registerd)[2:].zfill(5))
+    opcode = command[0]
 
-                machine_code = immediate + registerd + opcodes[opcode]
-            elif opcode in s_types:
-                print("s")
-            elif opcode in r_types:
-                print("r")
-                registerd = parameters[0]
-                registerd = int(registerd[1:])
-                registerd = str(bin(registerd)[2:].zfill(5))
+    if command[-2] == ";":  # comment
+        command = command[:-2]
 
-                register1 = parameters[1]
-                register1 = int(register1[1:])
-                register1 = str(bin(register1)[2:].zfill(5))
+    opcode = command[0]
+    command = command[1:]
 
-                register2 = parameters[2]
-                register2 = int(register2[1:])
-                register2 = str(bin(register2)[2:].zfill(5))
+    for param in command:
+        if param[0] == "r":
+            parameters = parameters + (int(param[1:]),)
+        elif param[-1] != ")" and not param.isalpha():
+            parameters = parameters + (int(param),)
+        elif param.isalpha():
+            parameters = parameters + (param,)
+        elif param[-1] == ")":
+            param = param.split("(")
+            parameters = parameters + (
+                int(param[1][1:-1]),
+                int(param[0]),
+            )
 
-                machine_code = (
-                    funct7s[opcode]
-                    + register2
-                    + register1
-                    + funct3s[opcode]
-                    + registerd
-                    + opcodes[opcode]
-                )
-            elif opcode in b_types:
-                print("b")
-            elif opcode in j_types:
-                print("j")
+    print(label, opcode, parameters)
 
-            binary_opcode = opcodes[opcode]
-            binary_funct3 = funct3s["sll"]
-            binary_funct7 = funct7s["sll"]
+    return (label, opcode, parameters)
+
+
+input_file_path = sys.argv[1]
+
+catch_labels(input_file_path)
+
+with open(input_file_path) as input_file:
+    for line in input_file:
+        (label, opcode, parameters) = parse_line(line)
+        if opcode is None:  # empty line
+            continue
+        if opcode in i_types:
+            print("i")
+            machine_code = (
+                str(bin(parameters[2])[2:].zfill(12))
+                + str(bin(parameters[1])[2:].zfill(5))
+                + funct3s(opcode)
+                + str(bin(parameters[0])[2:].zfill(5))
+                + opcodes(opcode)
+            )
+        elif opcode in u_types:
+            print("u")
+        elif opcode in s_types:
+            print("s")
+        elif opcode in r_types:
+            print("r")
+        elif opcode in b_types:
+            print("b")
+        elif opcode in j_types:
+            print("j")
+
+        binary_opcode = opcodes[opcode]
+        binary_funct3 = funct3s["sll"]
+        binary_funct7 = funct7s["sll"]

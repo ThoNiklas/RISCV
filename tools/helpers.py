@@ -108,6 +108,14 @@ i_types = (
     "jalr",
 )
 
+loads = (
+    "lb",
+    "lh",
+    "lw",
+    "lbu",
+    "lhu",
+)
+
 u_types = (
     "auipc",
     "lui",
