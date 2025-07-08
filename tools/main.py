@@ -67,8 +67,12 @@ def parse_line(line):
     return (label, opcode, parameters)
 
 
-def dec_to_bin(register, fill):
-    return str(bin(register)[2:].zfill(fill))
+def dec_to_bin(n, bits):
+    if n < 0:
+        n = (1 << bits) + n  # two's complement for negative n
+    if n >= (1 << bits):
+        raise ValueError(f"Number {n} doesn't fit in {bits} bits")
+    return bin(n)[2:].zfill(bits)
 
 
 input_file_path = sys.argv[1]
