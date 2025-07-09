@@ -53,9 +53,12 @@ def parse_line(line):
         command = command[1:]
 
     opcode = command[0]
+    if opcode not in opcodes:
+        print("Opcode not valid in line: ", int(address / 4) + 1, "\n", line)
 
-    if command[-2] == ";":  # comment
-        command = command[:-2]
+    if ";" in command:  # comment
+        index = command.index(";")
+        command = command[:index]
 
     opcode = command[0]
     command = command[1:]
@@ -139,7 +142,8 @@ with open(input_file_path) as input_file:
                 + dec_to_bin(parameters[1], 5)
                 + dec_to_bin(parameters[0], 5)
                 + funct3s[opcode]
-                + immediate[8:13]
+                + immediate[8:12]
+                + immediate[1]
                 + opcodes[opcode]
             )
         elif opcode in j_types:
@@ -155,6 +159,15 @@ with open(input_file_path) as input_file:
             )
         address = address + 4
         # print(machine_code, len(machine_code))
-        output_file.write(machine_code + "\n")
+        output_file.write(
+            machine_code[0:8]
+            + " "
+            + machine_code[8:16]
+            + " "
+            + machine_code[16:24]
+            + " "
+            + machine_code[24:32]
+            + "\n"
+        )
 
 output_file.close()
