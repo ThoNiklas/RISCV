@@ -13,7 +13,7 @@ module data_memory #(parameter RegBits=32)
 
     initial begin
         $display("Read RAM");
-        $readmemh("./mem/hex_ram.mem", mem); // load hex file
+        $readmemh("./src/mem/hex_ram.mem", mem); // load hex file
         //$readmemb("../mem/bin_ram.mem", mem); // load bin file
 
     end

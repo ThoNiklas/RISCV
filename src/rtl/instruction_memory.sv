@@ -11,7 +11,7 @@ module instruction_memory #(parameter RegBits=32)
     initial begin
         $display("Read ROM");
         //$readmemh("./mem/hex_rom.mem", mem); // load hex file
-        $readmemb("../mem/bin_rom.mem", mem); // load bin file
+        $readmemb("./src/mem/bin_rom.mem", mem); // load bin file
 
     end
 
