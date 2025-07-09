@@ -1,3 +1,4 @@
+import re
 import sys
 
 from helpers import (
@@ -27,14 +28,25 @@ def catch_labels(file):
 
 
 def parse_line(line):
-    line = line.replace(",", "")
-    command = line.split()
-
     label = None
     opcode = None
     parameters = ()
+
+    line_split = line.replace(",", "")
+    command = line_split.split()
+
     if len(command) == 0:
         return (label, opcode, parameters)
+    check = re.search(
+        r"(([a-z]+:)?\s+)?[a-z]+\s+r([0-9]|1[0-9]|2[0-9]|3[0-1]),\s+"
+        r"(\d+\(r([0-9]|1[0-9]|2[0-9]|3[0-1])\)|r([0-9]|1[0-9]|2[0-9]|3[0-1]),"
+        r"\s\d+|r([0-9]|1[0-9]|2[0-9]|3[0-1]),\s+r([0-9]|1[0-9]|2[0-9]|3[0-1])"
+        r"|\d+|r([0-9]|1[0-9]|2[0-9]|3[0-1]),\s+[a-zA-Z]+|[a-zA-Z]+)(\s+;.*)?",
+        line,
+    )
+    if not check:
+        print("Line Error in line: ", int(address / 4 + 1), "\n", line)
+        exit()
 
     if command[0][-1] == ":":  # label
         label = command[0][:-1]
@@ -142,7 +154,7 @@ with open(input_file_path) as input_file:
                 + opcodes[opcode]
             )
         address = address + 4
-        print(machine_code, len(machine_code))
+        # print(machine_code, len(machine_code))
         output_file.write(machine_code + "\n")
 
 output_file.close()
