@@ -17,3 +17,6 @@ riscv_tb:
 
 write_rom:
 	python $(ASSEMBLER) $(CODE) $(ROM)
+
+wave: run
+	gtkwave riscv_tb.vcd
