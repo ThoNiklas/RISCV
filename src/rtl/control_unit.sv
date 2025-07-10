@@ -55,7 +55,7 @@ module control_unit (
             7'b1100111: begin // jalr
                 reg_write_o = 1'b1;
                 alu_source_o = 1'b1;
-                alu_op = 2'b10;
+                alu_op = 2'b00;
                 write_back_source_o = 2'b10;
             end
             7'b0010111: begin // auipc
