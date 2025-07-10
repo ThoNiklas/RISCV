@@ -2,3 +2,7 @@ obj_dir
 **/*.vcd
 **/~*
 **/__pycache__
+**/mem/*.mem
+**/tmp*
+**/.null-ls_*_Makefile
+**/test.asm
