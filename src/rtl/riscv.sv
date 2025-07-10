@@ -8,7 +8,7 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
     output logic [RegBits-1:0] write_back_o, register_a_o, register_b_o,
     output logic [RegBits-1:0] source_b_o, alu_result_o,
     output logic [3:0] alu_control_o, onzc_o,
-    output logic memory_write_o,
+    output logic [1:0] memory_write_o,
     output logic [RegBits-1:0] read_data_o,
     output logic [RegBits-1:0] result_o, result_extended_o,
     output logic [2:0] result_extend_control_o,
@@ -31,7 +31,7 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
     logic [RegBits-1:0] write_back, register_a, register_b;
     logic [RegBits-1:0] source_b, alu_result;
     logic [3:0] alu_control, onzc;
-    logic memory_write;
+    logic [1:0] memory_write;
     logic [RegBits-1:0] read_data;
     logic [RegBits-1:0] result, result_extended;
     logic [2:0] result_extend_control;
