@@ -132,6 +132,7 @@ r_types = (
     "add",
     "sub",
     "sll",
+    "slt",
     "sltu",
     "xor",
     "srl",
