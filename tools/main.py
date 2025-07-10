@@ -161,7 +161,6 @@ with open(input_file_path) as input_file:
                 + opcodes[opcode]
             )
         address = address + 4
-        # print(machine_code, len(machine_code))
         output_file.write(
             machine_code[0:8]
             + " "
