@@ -101,8 +101,11 @@ with open(input_file_path) as input_file:
         if opcode is None:  # empty line
             continue
         if opcode in i_types:
+            immediate = parameters[2]
+            if opcode == "srai":
+                immediate = immediate + 1024
             machine_code = (
-                dec_to_bin(parameters[2], 12)
+                dec_to_bin(immediate, 12)
                 + dec_to_bin(parameters[1], 5)
                 + funct3s[opcode]
                 + dec_to_bin(parameters[0], 5)
