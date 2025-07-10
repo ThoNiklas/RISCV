@@ -118,8 +118,8 @@ with open(input_file_path) as input_file:
             immediate = dec_to_bin(parameters[2], 12)
             machine_code = (
                 immediate[0:7]
-                + dec_to_bin(parameters[1], 5)
                 + dec_to_bin(parameters[0], 5)
+                + dec_to_bin(parameters[1], 5)
                 + funct3s[opcode]
                 + immediate[7:12]
                 + opcodes[opcode]
