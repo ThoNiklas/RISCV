@@ -1,4 +1,5 @@
 #include "Vriscv.h"
+#include "RiscvMonitor.h"
 
 using namespace sc_core;
 
@@ -34,12 +35,12 @@ int sc_main(int argc, char** argv) {
 
     Vriscv* dut = new Vriscv{"dut"};
     dut->clk_i(clk);
-    dut->alu_control_o(alu_control_sig);
-    dut->immediate_extended_o(immediate_extended_sig);
     dut->reg_write_o(reg_write_sig);
     dut->alu_source_o(alu_source_sig);
     dut->result_source_o(result_source_sig);
     dut->rst_i(rst_sig);
+    dut->alu_control_o(alu_control_sig);
+    dut->immediate_extended_o(immediate_extended_sig);
     dut->onzc_o(onzc_sig);
     dut->memory_write_o(memory_write_sig);
     dut->result_extend_control_o(result_extend_control_sig);
@@ -60,6 +61,34 @@ int sc_main(int argc, char** argv) {
     dut->pc_plus_4_o(pc_plus_4_sig);
     dut->pc_target_o(pc_target_sig);
 
+
+    RiscvMonitor monitor("monitor");
+    monitor.clk(clk);
+    monitor.reg_write(reg_write_sig);
+    monitor.alu_source(alu_source_sig);
+    monitor.result_source(result_source_sig);
+    monitor.rst(rst_sig);
+    monitor.alu_control(alu_control_sig);
+    monitor.immediate_extended(immediate_extended_sig);
+    monitor.onzc(onzc_sig);
+    monitor.memory_write(memory_write_sig);
+    monitor.result_extend_control(result_extend_control_sig);
+    monitor.immediate_source(immediate_source_sig);
+    monitor.write_back_source(write_back_source_sig);
+    monitor.pc_source(pc_source_sig);
+    monitor.instr(instr_sig);
+    monitor.pc(pc_sig);
+    monitor.pc_next(pc_next_sig);
+    monitor.write_back(write_back_sig);
+    monitor.register_a(register_a_sig);
+    monitor.register_b(register_b_sig);
+    monitor.source_b(source_b_sig);
+    monitor.alu_result(alu_result_sig);
+    monitor.read_data(read_data_sig);
+    monitor.result(result_sig);
+    monitor.result_extended(result_extended_sig);
+    monitor.pc_plus_4(pc_plus_4_sig);
+    monitor.pc_target(pc_target_sig);
 
     sc_trace_file* trace_file = sc_create_vcd_trace_file(argv[1]);
     trace_file->set_time_unit(1, sc_core::SC_NS);
@@ -91,9 +120,13 @@ int sc_main(int argc, char** argv) {
     sc_trace(trace_file, pc_target_sig, "pc_target");
 
     sc_start(5, SC_NS);
+
     rst_sig.write(true);
+    
     sc_start(50, SC_NS);
+
     sc_close_vcd_trace_file(trace_file);
+
     delete dut;
     return 0;
 }
