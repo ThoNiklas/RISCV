@@ -1,6 +1,5 @@
-`include "config.svh"
 
-module riscv_tb ();
+module riscv_env ();
 
     parameter int RegBits = 32;
     parameter int AddrBits = 5;
@@ -39,8 +38,8 @@ module riscv_tb ();
     riscv #(.RegBits(RegBits), .AddrBits(AddrBits)) dut (.clk_i(clk), .rst_i(rst));    
 
     initial begin 
-        $dumpfile("riscv_tb.vcd");
-        $dumpvars(0, riscv_tb);
+        $dumpfile("riscv_env.vcd");
+        $dumpvars(0, riscv_env);
         rst = 1'b0;
         clk = 1'b1;
         #5ns;

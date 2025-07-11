@@ -1,9 +1,8 @@
-`include "config.svh"
 
 module riscv #(parameter RegBits=32, parameter AddrBits=5) 
 (
 `ifdef TB
-    input logic [RegBits-1:0] instr_i,
+    output logic [RegBits-1:0] instr_o,
     output logic [RegBits-1:0] pc_o, pc_next_o,
     output logic [RegBits-1:0] write_back_o, register_a_o, register_b_o,
     output logic [RegBits-1:0] source_b_o, alu_result_o,
@@ -23,9 +22,6 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
     input logic clk_i, rst_i
 );
 
-`ifdef TB
-
-`else
     logic [RegBits-1:0] instr;
     logic [RegBits-1:0] pc_next, pc;
     logic [RegBits-1:0] write_back, register_a, register_b;
@@ -42,7 +38,7 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
     logic [1:0] pc_source;
     logic reg_write, alu_source;
     logic result_source;
-`endif
+
 
 
     program_counter #(.RegBits(RegBits)) program_counter (.clk_i(clk_i), 
@@ -128,6 +124,32 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
 
         source_b = alu_source ? immediate_extended : register_b;
 
+`ifdef TB
+        instr_o = instr;
+        pc_o = pc;
+        pc_next_o = pc_next;
+        write_back_o = write_back;
+        register_a_o = register_a;
+        register_b_o = register_b;
+        source_b_o = source_b;
+        alu_result_o = alu_result;
+        alu_control_o = alu_control;
+        onzc_o = onzc;
+        memory_write_o = memory_write;
+        read_data_o = read_data;
+        result_o = result;
+        result_extended_o = result_extended;
+        result_extend_control_o = result_extend_control;
+        pc_plus_4_o = pc_plus_4;
+        pc_target_o = pc_target;
+        immediate_extended_o = immediate_extended;
+        immediate_source_o = immediate_source;
+        write_back_source_o = write_back_source;
+        pc_source_o = pc_source;
+        reg_write_o = reg_write;
+        alu_source_o = alu_source;
+        result_source_o = result_source;
+`endif
 
         
         
