@@ -29,7 +29,36 @@ SC_MODULE(RiscvMonitor) {
     sc_in<uint32_t> pc_target;
 
     void monitor_proc() {
-        std::cout << "hello" << std::endl;        
+        uint32_t opcode = instr & 0x7F;
+        uint32_t rs1, rs2, rd, funct3, funct7, imm;
+
+        if (opcode == 3 || opcode == 19 || opcode == 103) { // I-type
+            rs1 = (instr & ( 0x1F << 15)) >> 15;
+            rd = (instr & ( 0x1F << 7 )) >> 7;
+            funct3 = (instr & (0x7 << 12)) >> 12;
+            imm = (instr & (0x3FFF << 20)) >> 20;
+        } else if (opcode == 23 || opcode == 55) { // U-type
+            rd = (instr & (0x1F << 7) >> 7);
+            imm = instr & (0xFFFFF << 12);
+        } else if (opcode == 35) { // S-type
+            rs1 = (instr & (0x1F << 15) >> 15);
+            rs2 = (instr & (0x1F << 20) >> 20);
+            // todo immediate
+        } else if (opcode == 51) { // R-type
+            rd = (instr & (0x1F << 7) >> 7);
+            rs1 = (instr & (0x1F << 15) >> 15);
+            rs2 = (instr & (0x1F << 20) >> 20);
+            funct3 = (instr & (0x7 << 12) >> 12);
+            funct7 = (instr & (0x7F << 25) >> 25);
+        } else if (opcode == 99) { // B-type
+            rs1 = (instr & (0x1F << 15) >> 15);
+            rs2 = (instr & (0x1F << 20) >> 20);
+            funct3 = (instr & (0x7 << 12) >> 12);
+            // todo immediate
+        } else if (opcode == 111) { // J-type
+            rd = (instr & (0x1F << 7) >> 7);
+            // todo immediate
+        }
     }
 
     SC_CTOR(RiscvMonitor) {
