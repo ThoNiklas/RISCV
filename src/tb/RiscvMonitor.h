@@ -43,7 +43,9 @@ SC_MODULE(RiscvMonitor) {
         } else if (opcode == 35) { // S-type
             rs1 = (instr & (0x1F << 15) >> 15);
             rs2 = (instr & (0x1F << 20) >> 20);
-            // todo immediate
+            uint32_t upper_immediate = (instr & (0x7F << 25) >> 20);
+            uint32_t lower_immediate = (instr & (0x1F << 7) >> 7);
+            imm = upper_immediate + lower_immediate;
         } else if (opcode == 51) { // R-type
             rd = (instr & (0x1F << 7) >> 7);
             rs1 = (instr & (0x1F << 15) >> 15);
@@ -54,10 +56,14 @@ SC_MODULE(RiscvMonitor) {
             rs1 = (instr & (0x1F << 15) >> 15);
             rs2 = (instr & (0x1F << 20) >> 20);
             funct3 = (instr & (0x7 << 12) >> 12);
-            // todo immediate
+            imm = (instr & (0xFFFFF << 12));
         } else if (opcode == 111) { // J-type
             rd = (instr & (0x1F << 7) >> 7);
-            // todo immediate
+            uint32_t imm_20 = (instr & (0x1 << 31) >> 11);
+            uint32_t imm_19_12 = (instr & (0xFF << 12));
+            uint32_t imm_11 = (instr & (0x1 << 13) >> 2);
+            uint32_t imm_10_1 = (instr & (0x3FF << 14) >> 13);
+            imm = imm_20 + imm_19_12 + imm_11 + imm_10_1;
         }
     }
 
