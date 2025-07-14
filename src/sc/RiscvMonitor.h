@@ -33,7 +33,36 @@ SC_MODULE(RiscvMonitor) {
     uint32_t reg_file[32];
     uint32_t data_mem[1024];
 
+    SignalChecker* signal_checker;
+
     void monitor_proc() {
+        signal_checker = new SignalChecker(
+            reg_write.read(),
+            alu_source.read(),
+            result_source.read(),
+            rst.read(),
+            alu_control.read(),
+            immediate_extended.read(),
+            onzc.read(),
+            memory_write.read(),
+            result_extend_control.read(),
+            immediate_source.read(),
+            write_back_source.read(),
+            pc_source.read(),
+            instr.read(),
+            pc.read(),
+            pc_next.read(),
+            write_back.read(),
+            register_a.read(),
+            register_b.read(),
+            source_b.read(),
+            alu_result.read(),
+            read_data.read(),
+            result.read(),
+            result_extended.read(),
+            pc_plus_4.read(),
+            pc_target.read()
+        );
         uint32_t opcode = instr & 0x7F;
         uint32_t rs1, rs2, rd, funct3, funct7, imm;
         bool checked_signals = false;
@@ -43,26 +72,42 @@ SC_MODULE(RiscvMonitor) {
             rd = (instr & ( 0x1F << 7 )) >> 7;
             funct3 = (instr & (0x7 << 12)) >> 12;
             imm = (instr & (0x3FFF << 20)) >> 20;
+
+            signal_checker->check_i_type(opcode, rd, rs1, funct3, imm);
+
         } else if (opcode == 23 || opcode == 55) { // U-type
             rd = (instr & (0x1F << 7) >> 7);
             imm = instr & (0xFFFFF << 12);
+
+            signal_checker->check_u_type(opcode, rd, imm);
+
         } else if (opcode == 35) { // S-type
             rs1 = (instr & (0x1F << 15) >> 15);
             rs2 = (instr & (0x1F << 20) >> 20);
+            funct3 = (instr & (0x7 << 12) >> 12);
             uint32_t upper_immediate = (instr & (0x7F << 25) >> 20);
             uint32_t lower_immediate = (instr & (0x1F << 7) >> 7);
             imm = upper_immediate + lower_immediate;
+
+            signal_checker->check_s_type(rs1, rs2, funct3, imm);
+
         } else if (opcode == 51) { // R-type
             rd = (instr & (0x1F << 7) >> 7);
             rs1 = (instr & (0x1F << 15) >> 15);
             rs2 = (instr & (0x1F << 20) >> 20);
             funct3 = (instr & (0x7 << 12) >> 12);
             funct7 = (instr & (0x7F << 25) >> 25);
+
+            signal_checker->check_r_type(rd, rs1, rs2, funct3, funct7);
+
         } else if (opcode == 99) { // B-type
             rs1 = (instr & (0x1F << 15) >> 15);
             rs2 = (instr & (0x1F << 20) >> 20);
             funct3 = (instr & (0x7 << 12) >> 12);
             imm = (instr & (0xFFFFF << 12));
+
+            signal_checker->check_b_type(rs1, rs2, funct3, imm);
+
         } else if (opcode == 111) { // J-type
             rd = (instr & (0x1F << 7) >> 7);
             uint32_t imm_20 = (instr & (0x1 << 31) >> 11);
@@ -70,29 +115,9 @@ SC_MODULE(RiscvMonitor) {
             uint32_t imm_11 = (instr & (0x1 << 13) >> 2);
             uint32_t imm_10_1 = (instr & (0x3FF << 14) >> 13);
             imm = imm_20 + imm_19_12 + imm_11 + imm_10_1;
-        }
-    }
 
-    bool check_i_type(uint32_t rd, uint32_t rs1, uint32_t rs2, uint32_t funct3, uint32_t funct7) {
-        if (!reg_write) return false;
-        if (alu_source) return false;
-        if (result_source) return false;
-        //alu_control;
-        //immediate_extended;
-        //onzc;
-        //memory_write;
-        //result_extend_control;
-        //immediate_source;
-        //write_back_source;
-        //pc_source;
-        //write_back;
-        //register_a;
-        //register_b;
-        //alu_result;
-        //read_data;
-        //result;
-        //result_extended;
-        return false;
+            signal_checker->check_j_type(rd, imm);
+        }
     }
 
     SC_CTOR(RiscvMonitor) {

@@ -18,7 +18,7 @@ run_sc: write_rom riscv_sc
 	$(OBJDIR)/Vriscv riscv_sc
 
 riscv_sc: 
-	verilator --sc --exe -j 0 -Wall -DTB $(RTL)/*.sv $(SC)/sc_main.cpp --top-module riscv -build
+	verilator --sc --exe -j 0 -Wall -DTB $(RTL)/*.sv $(SC)/sc_main.cpp $(SC)/SignalChecker.cpp --top-module riscv -build
 
 riscv: 
 	verilator --binary -j 0 -Wall --trace $(RTL)/*.sv $(TB)/*.sv --top-module riscv_env
