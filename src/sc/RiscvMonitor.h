@@ -73,7 +73,7 @@ SC_MODULE(RiscvMonitor) {
             funct3 = (instr & (0x7 << 12)) >> 12;
             imm = (instr & (0x3FFF << 20)) >> 20;
 
-            signal_checker->check_i_type(opcode, rd, rs1, funct3, imm);
+            signal_checker->check_i_type(opcode, rd, reg_file[rs1], funct3, imm);
 
         } else if (opcode == 23 || opcode == 55) { // U-type
             rd = (instr & (0x1F << 7) >> 7);
@@ -118,6 +118,7 @@ SC_MODULE(RiscvMonitor) {
 
             signal_checker->check_j_type(rd, imm);
         }
+        signal_checker->display_error();
     }
 
     SC_CTOR(RiscvMonitor) {

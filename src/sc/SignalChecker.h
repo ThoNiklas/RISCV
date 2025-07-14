@@ -94,4 +94,8 @@ class SignalChecker {
         signal_type result_extended_check;
         signal_type pc_plus_4_check;
         signal_type pc_target_check;
+
+        uint32_t get_alu_control(uint32_t opcode, uint32_t funct3, uint32_t funct7);
+        uint32_t simulate_alu_operation(uint32_t operation, uint32_t operand1, uint32_t operand2);
+        bool is_correct();
 };
