@@ -2,6 +2,7 @@
 SOURCE = ./src
 RTL = $(SOURCE)/rtl
 TB = $(SOURCE)/tb
+SC = $(SOURCE)/sc
 ASSEMBLER = ./tools/main.py
 CODE = ./code/test.asm
 ROM = $(SOURCE)/mem/bin_rom.mem
@@ -17,7 +18,7 @@ run_sc: write_rom riscv_sc
 	$(OBJDIR)/Vriscv riscv_sc
 
 riscv_sc: 
-	verilator --sc --exe -j 0 -Wall -DTB $(RTL)/*.sv $(TB)/sc_main.cpp --top-module riscv -build
+	verilator --sc --exe -j 0 -Wall -DTB $(RTL)/*.sv $(SC)/sc_main.cpp --top-module riscv -build
 
 riscv: 
 	verilator --binary -j 0 -Wall --trace $(RTL)/*.sv $(TB)/*.sv --top-module riscv_env
@@ -30,3 +31,6 @@ wave_env: run_env
 
 wave_sc: run_sc
 	gtkwave $(VCD_SC).vcd
+
+clean:
+	rm -r $(OBJDIR)

@@ -28,9 +28,13 @@ SC_MODULE(RiscvMonitor) {
     sc_in<uint32_t> pc_plus_4;
     sc_in<uint32_t> pc_target;
 
+    uint32_t reg_file[32];
+    uint32_t data_mem[1024];
+
     void monitor_proc() {
         uint32_t opcode = instr & 0x7F;
         uint32_t rs1, rs2, rd, funct3, funct7, imm;
+        bool checked_signals = false;
 
         if (opcode == 3 || opcode == 19 || opcode == 103) { // I-type
             rs1 = (instr & ( 0x1F << 15)) >> 15;
@@ -67,8 +71,38 @@ SC_MODULE(RiscvMonitor) {
         }
     }
 
+    bool check_i_type(uint32_t rd, uint32_t rs1, uint32_t rs2, uint32_t funct3, uint32_t funct7) {
+        if (!reg_write) return false;
+        if (alu_source) return false;
+        if (result_source) return false;
+        //alu_control;
+        //immediate_extended;
+        //onzc;
+        //memory_write;
+        //result_extend_control;
+        //immediate_source;
+        //write_back_source;
+        //pc_source;
+        //write_back;
+        //register_a;
+        //register_b;
+        //alu_result;
+        //read_data;
+        //result;
+        //result_extended;
+        return false;
+    }
+
     SC_CTOR(RiscvMonitor) {
         SC_METHOD(monitor_proc);
         sensitive << clk.neg();
+
+        for (int i = 0; i < (sizeof(reg_file)/sizeof(reg_file[0])); i++) {
+            reg_file[i] = 0;
+        }
+
+        for (int i = 0; i < (sizeof(data_mem)/sizeof(data_mem[0])); i++) {
+            data_mem[i] = 0;
+        }
     }
 };
