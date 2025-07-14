@@ -1,3 +1,5 @@
+#include "SignalChecker.h"
+
 using namespace sc_core;
 
 SC_MODULE(RiscvMonitor) {
