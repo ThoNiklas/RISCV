@@ -60,7 +60,7 @@ class SignalChecker {
                   uint32_t pc_plus_4,
                   uint32_t pc_target);
 
-        void check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uint32_t funct3, uint32_t imm);
+        void check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uint32_t funct3, uint32_t imm, uint32_t data);
         void check_r_type(uint32_t rd, uint32_t rs1, uint32_t rs2, uint32_t funct3, uint32_t funct7);
         void check_b_type(uint32_t rs1, uint32_t rs2, uint32_t funct3, uint32_t imm);
         void check_j_type(uint32_t rd, uint32_t imm);
@@ -96,6 +96,8 @@ class SignalChecker {
         signal_type pc_target_check;
 
         uint32_t get_alu_control(uint32_t opcode, uint32_t funct3, uint32_t funct7);
+        uint32_t get_result_extend_control(uint32_t funct3);
         uint32_t simulate_alu_operation(uint32_t operation, uint32_t operand1, uint32_t operand2);
+        uint32_t simulate_result_extender(uint32_t input, uint32_t control);
         bool is_correct();
 };

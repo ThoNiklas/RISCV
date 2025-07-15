@@ -74,6 +74,22 @@ bool SignalChecker::is_correct() {
     else return true;
 }
 
+uint32_t SignalChecker::get_result_extend_control(uint32_t funct3) {
+    switch(funct3) {
+        case 0b000: // lb
+            return 0b001;
+        case 0b001: // lh
+            return 0b010;
+        case 0b010: // lw
+            return 0b000;
+        case 0b100: // lbu
+            return 0b101;
+        case 0b101: // lwu
+            return 0b110;
+    }
+    return 0b111;
+}
+
 
 uint32_t SignalChecker::simulate_alu_operation(uint32_t operation, uint32_t operand1, uint32_t operand2) {
     switch(operation) {
@@ -184,15 +200,47 @@ SignalChecker::SignalChecker(bool reg_write,
 }
 
 
+uint32_t SignalChecker::simulate_result_extender(uint32_t input, uint32_t control) {
+    switch(control) {
+        case 0b000:
+            return input;
+        case 0b001:
+            return int32_t((input & 0xFF));
+        case 0b010:
+            return int32_t((input & 0xFFFF));
+        case 0b101:
+            return (input & 0xFF);
+        case 0b110:
+            return (input & 0xFFFF);
+    }
+    return 0;
+}
 
-void SignalChecker::check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uint32_t funct3, uint32_t imm) {
+void SignalChecker::check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uint32_t funct3, uint32_t imm, uint32_t data) {
    uint32_t alu_operation = get_alu_control(opcode, funct3, (imm & (0x7F << 5) >> 5));
+   uint32_t load_extend_control = get_result_extend_control(funct3);
    switch(opcode) {
     case 3: // loads         
+        pc_source_check = (pc_source == 0b00) ? correct : incorrect;
+        result_source_check = (result_source == true) ? correct : incorrect;
+        memory_write_check = (memory_write == false) ? correct : incorrect;
+        alu_control_check = (alu_control == alu_operation) ? correct : incorrect;
+        alu_source_check = (alu_source == true) ? correct : incorrect;
+        result_extend_control_check = (result_extend_control == load_extend_control) ? correct : incorrect;
+        write_back_source_check = (write_back_source == 0b00) ? correct : incorrect;
+        immediate_source_check = (immediate_source == 0b000) ? correct : incorrect;
+        reg_write_check = (reg_write == true) ? correct : incorrect;
+        register_a_check = (register_a == rs1) ? correct : incorrect;
+        source_b_check = (source_b == imm) ? correct : incorrect;
+        alu_result_check = (alu_result == simulate_alu_operation(opcode, register_a, source_b)) ? correct : incorrect;
+        result_check = (result == data) ? correct : incorrect;
+        result_extended_check = (result_extended == simulate_result_extender(result, result_extend_control)) ? correct : incorrect;
+        write_back_check = (write_back == result_extended) ? correct : incorrect;
+        pc_next_check = (pc_next == pc_plus_4) ? correct : incorrect;
         break;
     case 19: // immediate operations
         pc_source_check = (pc_source == 0b00) ? correct : incorrect;
-        result_source_check = (result_source == 0b0) ? correct : incorrect;
+        result_source_check = (result_source == false)? correct : incorrect;
         memory_write_check = (memory_write == false) ? correct : incorrect;
         alu_control_check = (alu_operation == alu_control) ? correct : incorrect; 
         alu_source_check = (alu_source == true) ? correct : incorrect;
