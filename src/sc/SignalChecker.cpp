@@ -235,7 +235,22 @@ void SignalChecker::check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uin
         signal_checks[pc_next_check] = (pc_next == pc_plus_4) ? correct : incorrect;
         break;
     case 103: // jalr
-
+        signal_checks[pc_source_check] = (pc_source == 0b10) ? correct : incorrect;
+        signal_checks[result_source_check] = (result_source == false)? correct : incorrect;
+        signal_checks[memory_write_check] = (memory_write == false) ? correct : incorrect;
+        signal_checks[alu_control_check] = (alu_operation == alu_control) ? correct : incorrect; 
+        signal_checks[alu_source_check] = (alu_source == true) ? correct : incorrect;
+        signal_checks[result_extend_control_check] = (result_extend_control == 0b000) ? correct : incorrect;
+        signal_checks[write_back_source_check] = (write_back_source == 0b10) ? correct : incorrect;
+        signal_checks[immediate_source_check] = (immediate_source == 0b000) ? correct : incorrect;
+        signal_checks[reg_write_check] = (reg_write == true) ? correct : incorrect;
+        signal_checks[register_a_check] = (register_a == rs1) ? correct : incorrect;
+        signal_checks[source_b_check] = (source_b = imm) ? correct : incorrect;
+        signal_checks[alu_result_check] = (alu_result == simulate_alu_operation(alu_operation, register_a, source_b)) ? correct : incorrect;
+        signal_checks[result_check] = (result == alu_result) ? correct : incorrect;
+        signal_checks[result_extended_check] = (result_extended == result) ? correct : incorrect;
+        signal_checks[write_back_check] = (write_back == pc_plus_4) ? correct : incorrect;
+        signal_checks[pc_next_check] = (pc_next == result) ? correct : incorrect;
         break;
 } 
 }
