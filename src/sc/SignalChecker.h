@@ -6,6 +6,35 @@ typedef enum signal_type{
     not_used,
 } signal_type;
 
+typedef enum signal_checkers{
+    reg_write_check,
+    alu_source_check,
+    result_source_check,
+    rst_check,
+    alu_control_check,
+    immediate_extended_check,
+    onzc_check,
+    memory_write_check,
+    result_extend_control_check,
+    immediate_source_check,
+    write_back_source_check,
+    pc_source_check,
+    instr_check,
+    pc_check,
+    pc_next_check,
+    write_back_check,
+    register_a_check,
+    register_b_check,
+    source_b_check,
+    alu_result_check,
+    read_data_check,
+    result_check,
+    result_extended_check,
+    pc_plus_4_check,
+    pc_target_check,
+    SIGNAL_CHECKERS_NR
+} signal_checkers;
+
 class SignalChecker {
     public:
         bool reg_write;
@@ -69,31 +98,7 @@ class SignalChecker {
         void display_error();
 
     private:
-        signal_type reg_write_check;
-        signal_type alu_source_check;
-        signal_type result_source_check;
-        signal_type rst_check;
-        signal_type alu_control_check;
-        signal_type immediate_extended_check;
-        signal_type onzc_check;
-        signal_type memory_write_check;
-        signal_type result_extend_control_check;
-        signal_type immediate_source_check;
-        signal_type write_back_source_check;
-        signal_type pc_source_check;
-        signal_type instr_check;
-        signal_type pc_check;
-        signal_type pc_next_check;
-        signal_type write_back_check;
-        signal_type register_a_check;
-        signal_type register_b_check;
-        signal_type source_b_check;
-        signal_type alu_result_check;
-        signal_type read_data_check;
-        signal_type result_check;
-        signal_type result_extended_check;
-        signal_type pc_plus_4_check;
-        signal_type pc_target_check;
+        signal_type signal_checks[SIGNAL_CHECKERS_NR];
 
         uint32_t get_alu_control(uint32_t opcode, uint32_t funct3, uint32_t funct7);
         uint32_t get_result_extend_control(uint32_t funct3);
