@@ -123,7 +123,7 @@ int sc_main(int argc, char** argv) {
 
     rst_sig.write(true);
     
-    sc_start(50, SC_NS);
+    sc_start(100, SC_NS);
 
     sc_close_vcd_trace_file(trace_file);
 

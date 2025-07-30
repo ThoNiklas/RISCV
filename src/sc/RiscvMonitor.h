@@ -1,4 +1,5 @@
 #include "SignalChecker.h"
+#include <cmath>
 
 using namespace sc_core;
 
@@ -30,8 +31,8 @@ SC_MODULE(RiscvMonitor) {
     sc_in<uint32_t> pc_plus_4;
     sc_in<uint32_t> pc_target;
 
-    uint32_t reg_file[32];
-    uint32_t data_mem[1024];
+    int32_t reg_file[32];
+    int32_t data_mem[1024];
 
     SignalChecker* signal_checker;
 
@@ -64,16 +65,18 @@ SC_MODULE(RiscvMonitor) {
             pc_target.read()
         );
         uint32_t opcode = instr & 0x7F;
-        uint32_t rs1, rs2, rd, funct3, funct7, imm;
+        uint32_t rs1, rs2, rd, funct3, funct7;
+        int32_t imm;
         bool checked_signals = false;
 
         if (opcode == 3 || opcode == 19 || opcode == 103) { // I-type
             rs1 = (instr & ( 0x1F << 15)) >> 15;
             rd = (instr & ( 0x1F << 7 )) >> 7;
             funct3 = (instr & (0x7 << 12)) >> 12;
-            imm = (instr & (0x3FFF << 20)) >> 20;
+            imm = (int32_t(instr) & (0x3FFF << 20)) / pow(2,20);
 
             signal_checker->check_i_type(opcode, rd, reg_file[rs1], funct3, imm, data_mem[reg_file[rs1] + imm]);
+            reg_file[rd] = result;
 
         } else if (opcode == 23 || opcode == 55) { // U-type
             rd = (instr & (0x1F << 7) >> 7);
@@ -82,31 +85,33 @@ SC_MODULE(RiscvMonitor) {
             signal_checker->check_u_type(opcode, rd, imm);
 
         } else if (opcode == 35) { // S-type
-            rs1 = (instr & (0x1F << 15) >> 15);
-            rs2 = (instr & (0x1F << 20) >> 20);
-            funct3 = (instr & (0x7 << 12) >> 12);
-            uint32_t upper_immediate = (instr & (0x7F << 25) >> 20);
-            uint32_t lower_immediate = (instr & (0x1F << 7) >> 7);
+            rs1 = (instr & (0x1F << 15)) >> 15;
+            rs2 = (instr & (0x1F << 20)) >> 20;
+            funct3 = (instr & (0x7 << 12)) >> 12;
+            uint32_t upper_immediate = (instr & (0x7F << 25)) >> 20;
+            uint32_t lower_immediate = (instr & (0x1F << 7)) >> 7;
             imm = upper_immediate + lower_immediate;
 
-            signal_checker->check_s_type(rs1, rs2, funct3, imm);
+            signal_checker->check_s_type(reg_file[rs1], reg_file[rs2], funct3, imm);
+            data_mem[reg_file[rs1] + imm] = result;
 
         } else if (opcode == 51) { // R-type
-            rd = (instr & (0x1F << 7) >> 7);
-            rs1 = (instr & (0x1F << 15) >> 15);
-            rs2 = (instr & (0x1F << 20) >> 20);
-            funct3 = (instr & (0x7 << 12) >> 12);
-            funct7 = (instr & (0x7F << 25) >> 25);
+            rd = (instr & (0x1F << 7)) >> 7;
+            rs1 = (instr & (0x1F << 15)) >> 15;
+            rs2 = (instr & (0x1F << 20)) >> 20;
+            funct3 = (instr & (0x7 << 12)) >> 12;
+            funct7 = (instr & (0x7F << 25)) >> 25;
 
-            signal_checker->check_r_type(rd, rs1, rs2, funct3, funct7);
+            signal_checker->check_r_type(opcode, rd, reg_file[rs1], reg_file[rs2], funct3, funct7);
+            reg_file[rd] = result_extended;
 
         } else if (opcode == 99) { // B-type
-            rs1 = (instr & (0x1F << 15) >> 15);
-            rs2 = (instr & (0x1F << 20) >> 20);
-            funct3 = (instr & (0x7 << 12) >> 12);
+            rs1 = (instr & (0x1F << 15)) >> 15;
+            rs2 = (instr & (0x1F << 20)) >> 20;
+            funct3 = (instr & (0x7 << 12)) >> 12;
             imm = (instr & (0xFFFFF << 12));
 
-            signal_checker->check_b_type(rs1, rs2, funct3, imm);
+            signal_checker->check_b_type(opcode, reg_file[rs1], reg_file[rs2], funct3, imm);
 
         } else if (opcode == 111) { // J-type
             rd = (instr & (0x1F << 7) >> 7);
@@ -116,8 +121,9 @@ SC_MODULE(RiscvMonitor) {
             uint32_t imm_10_1 = (instr & (0x3FF << 14) >> 13);
             imm = imm_20 + imm_19_12 + imm_11 + imm_10_1;
 
-            signal_checker->check_j_type(rd, imm);
+            signal_checker->check_j_type(opcode, rd, imm);
         }
+
         signal_checker->display_error();
     }
 
