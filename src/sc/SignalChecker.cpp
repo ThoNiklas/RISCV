@@ -34,92 +34,92 @@ std::string signal_checkers_names[SIGNAL_CHECKERS_NR] = {
 
 uint32_t SignalChecker::get_alu_control(uint32_t opcode, uint32_t funct3, uint32_t funct7) {
     bool op5_funct75 = (opcode & 0b0100000) && (funct7 & 0b0100000);
-    if (opcode == Load  || opcode == Jalr || opcode == Store || opcode == Auipc) return 0b0000;
-    else if (opcode == Branch) {
-        if (funct3 <= 0b101) return Sub;
-        else return Subu;
+    if (opcode == OP_LOAD  || opcode == OP_JALR || opcode == OP_STORE || opcode == OP_AUIPC) return ALU_CONTROL_ADD;
+    else if (opcode == OP_BRANCH) {
+        if (funct3 == FUNCT3_BLTU || funct3 == FUNCT3_BGEU) return ALU_CONTROL_SUBU;
+        else return ALU_CONTROL_SUB;
     } 
     else {
         switch(funct3) {
-        case 0b000:
-            if (!op5_funct75) return Add;
-            else return Sub;
+        case FUNCT3_ADD:
+            if (!op5_funct75) return ALU_CONTROL_ADD;
+            else return ALU_CONTROL_SUB;
             break;
-        case 0b001:
-            return Sll;
+        case FUNCT3_SLL:
+            return ALU_CONTROL_SLL;
             break;
-        case 0b010:
-            return Slt;
+        case FUNCT3_SLT:
+            return ALU_CONTROL_SLT;
             break;
-        case 0b011:
-            return Sltu;
+        case FUNCT3_SLTU:
+            return ALU_CONTROL_SLTU;
             break;
-        case 0b100:
-            return Xor;
+        case FUNCT3_XOR:
+            return ALU_CONTROL_XOR;
             break;
-        case 0b101:
-            if (funct7 & 0b0100000) return Sra;
-            else return Srl;
+        case FUNCT3_SRL:
+            if (funct7 & 0b0100000) return ALU_CONTROL_SRA;
+            else return ALU_CONTROL_SRL;
             break;
-        case 0b110:
-            return Or;
+        case FUNCT3_OR:
+            return ALU_CONTROL_OR;
             break;
-        case 0b111:
-            return And;
+        case FUNCT3_AND:
+            return ALU_CONTROL_AND;
             break;
         }
     }
-return Invalid;
+return ALU_CONTROL_INVALID;
 }
 
 uint32_t SignalChecker::get_pc_source(uint32_t opcode, uint32_t funct3) {
-    if (!(opcode & 0x40)) return 0b00;
+    if (!(opcode & 0x40)) return PC_SOURCE_PLUS_4;
     else {
         uint32_t op_tmp = (opcode & 0b1100) >> 2;
         switch(op_tmp) {
             case 0b00: {
                 switch(funct3) {
-                    case 0b000: {
-                        if (signals[onzc_sig] & 0b10) return 0b01;
-                        else return 0b00;
+                    case FUNCT3_BEQ: {
+                        if (signals[onzc_sig] & ONZC_ZERO) return PC_SOURCE_TARGET;
+                        else return PC_SOURCE_PLUS_4;
                     }
-                    case 0b001: {
-                        if (!(signals[onzc_sig] & 0b10)) return 0b01;
-                        else return 0b00;
+                    case FUNCT3_BNE: {
+                        if (!(signals[onzc_sig] & ONZC_ZERO)) return PC_SOURCE_TARGET;
+                        else return PC_SOURCE_PLUS_4;
                     }
-                    case 0b100: {
-                        if (signals[onzc_sig] & 0b100) return 0b01;
-                        else return 0b00;
+                    case FUNCT3_BLT: {
+                        if (signals[onzc_sig] & ONZC_NEGATIVE) return PC_SOURCE_TARGET;
+                        else return PC_SOURCE_PLUS_4;
                     }
-                    case 0b101: {
-                        if (!(signals[onzc_sig] & 0b100)) return 0b01;
-                        else return 0b00;
+                    case FUNCT3_BGE: {
+                        if (!(signals[onzc_sig] & ONZC_NEGATIVE)) return PC_SOURCE_TARGET;
+                        else return PC_SOURCE_PLUS_4;
                     }
-                    case 0b110: {
-                        if (signals[onzc_sig] & 0b100) return 0b01;
-                        else return 0b00;
+                    case FUNCT3_BLTU: {
+                        if (signals[onzc_sig] & ONZC_NEGATIVE) return PC_SOURCE_TARGET;
+                        else return PC_SOURCE_PLUS_4;
                     }
-                    case 0b111: {
-                        if (!(signals[onzc_sig] & 0b100)) return 0b01;
-                        else return 0b00;
+                    case FUNCT3_BGEU: {
+                        if (!(signals[onzc_sig] & ONZC_NEGATIVE)) return PC_SOURCE_TARGET;
+                        else return PC_SOURCE_PLUS_4;
                     }
                 }
             }
             case 0b01: {
-                if (funct3 == 0b000) return 0b10; // jalr
+                if (funct3 == FUNCT3_JALR) return PC_SOURCE_RESULT; // jalr
                 break;
             }
             case 0b10: {
-                return 0b00; // not used
+                return PC_SOURCE_PLUS_4; // not used
                 break;
             }
             case 0b11: {
-                return 0b01; // jal
+                return PC_SOURCE_TARGET; // jal
                 break;
             }
         }
     }
-    return 0b00;
+    return PC_SOURCE_PLUS_4;
 }
 
 bool SignalChecker::is_correct() {
@@ -154,46 +154,46 @@ bool SignalChecker::is_correct() {
 
 uint32_t SignalChecker::get_result_extend_control(uint32_t funct3) {
     switch(funct3) {
-        case 0b000: // lb
-            return 0b001;
-        case 0b001: // lh
-            return 0b010;
-        case 0b010: // lw
-            return 0b000;
-        case 0b100: // lbu
-            return 0b101;
-        case 0b101: // lwu
-            return 0b110;
+        case FUNCT3_LB: 
+            return RESULT_EXT_SIGNED_BYTE;
+        case FUNCT3_LH: 
+            return RESULT_EXT_SIGNED_HALF;
+        case FUNCT3_LW: 
+            return RESULT_EXT_NO;
+        case FUNCT3_LBU: 
+            return RESULT_EXT_UNSIGNED_BYTE;
+        case FUNCT3_LHU: 
+            return RESULT_EXT_UNSIGNED_HALF;
     }
-    return 0b111;
+    return RESULT_EXT_INVALID;
 }
 
 
 int32_t SignalChecker::simulate_alu_operation(uint32_t operation, int32_t operand1, int32_t operand2) {
     switch(operation) {
-        case Add:
+        case ALU_CONTROL_ADD:
             return operand1 + operand2;
-        case Sub:
+        case ALU_CONTROL_SUB:
             return int32_t(operand1) - int32_t(operand2);
-        case And:
+        case ALU_CONTROL_AND:
             return operand1 & operand2;
-        case Or:
+        case ALU_CONTROL_OR:
             return operand1 | operand2;
-        case Xor:
+        case ALU_CONTROL_XOR:
             return operand1 ^ operand2;
-        case Slt:
+        case ALU_CONTROL_SLT:
             if (int32_t(operand1) < int32_t(operand2)) return 0b1;
             else return 0b0;
-        case Sll:
+        case ALU_CONTROL_SLL:
             return operand1 << operand2;
-        case Sltu:
+        case ALU_CONTROL_SLTU:
             if (operand1 < operand2) return 0b1;
             else return 0b0;
-        case Srl:
+        case ALU_CONTROL_SRL:
             return operand1 >> operand2;
-        case Sra:
+        case ALU_CONTROL_SRA:
             return int64_t(operand1) >> operand2;
-        case Subu:
+        case ALU_CONTROL_SUBU:
             return operand1 - operand2;
     }
     return 0b0;
@@ -259,19 +259,19 @@ SignalChecker::SignalChecker(bool reg_write,
 
 uint32_t SignalChecker::simulate_result_extender(uint32_t input, uint32_t control) {
     switch(control) {
-        case 0b000:
+        case RESULT_EXT_NO:
             return input;
-        case 0b001: {
+        case RESULT_EXT_SIGNED_BYTE: {
             if (input & 0x80) return (input | 0xFFFFFF00);
             else return (input & 0xFF);
         }
-        case 0b010: {
+        case RESULT_EXT_SIGNED_HALF: {
             if (input & 0x8000) return (input | 0xFFFF0000);
             else return (input & 0xFFFF);
         }
-        case 0b101:
+        case RESULT_EXT_UNSIGNED_BYTE:
             return (input & 0xFF);
-        case 0b110:
+        case RESULT_EXT_UNSIGNED_HALF:
             return (input & 0xFFFF);
     }
     return 0;
@@ -282,7 +282,7 @@ void SignalChecker::check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uin
    uint32_t load_extend_control = get_result_extend_control(funct3);
    uint32_t extended_result = simulate_result_extender(signals[result_sig], signals[result_extend_control_sig]);
    switch(opcode) {
-    case 3: // loads         
+    case OP_LOAD:          
         signal_checks[pc_source_sig] = (signals[pc_source_sig] == 0b00) ? correct : incorrect;
         signal_checks[result_source_sig] = (signals[result_source_sig] == true) ? correct : incorrect;
         signal_checks[memory_write_sig] = (signals[memory_write_sig] == 0b00) ? correct : incorrect;
@@ -300,7 +300,7 @@ void SignalChecker::check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uin
         signal_checks[write_back_sig] = (signals[write_back_sig] == signals[result_extended_sig]) ? correct : incorrect;
         signal_checks[pc_next_sig] = (signals[pc_next_sig] == signals[pc_plus_4_sig]) ? correct : incorrect;
         break;
-    case 19: // immediate operations
+    case OP_IMMEDIATE:
         signal_checks[pc_source_sig] = (signals[pc_source_sig] == 0b00) ? correct : incorrect;
         signal_checks[result_source_sig] = (signals[result_source_sig] == false)? correct : incorrect;
         signal_checks[memory_write_sig] = (signals[memory_write_sig] == 0b00) ? correct : incorrect;
@@ -318,7 +318,7 @@ void SignalChecker::check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uin
         signal_checks[write_back_sig] = (signals[write_back_sig] == signals[result_sig]) ? correct : incorrect;
         signal_checks[pc_next_sig] = (signals[pc_next_sig] == signals[pc_plus_4_sig]) ? correct : incorrect;
         break;
-    case 103: // jalr
+    case OP_JALR: 
         signal_checks[pc_source_sig] = (signals[pc_source_sig] == 0b10) ? correct : incorrect;
         signal_checks[result_source_sig] = (signals[result_source_sig] == false)? correct : incorrect;
         signal_checks[memory_write_sig] = (signals[memory_write_sig] == false) ? correct : incorrect;
@@ -407,11 +407,11 @@ void SignalChecker::check_u_type(uint32_t opcode, uint32_t rd, uint32_t imm) {
     uint32_t write_back_source = 0b0;
     uint32_t write_back = 0b0;
 
-    if (opcode == 23) { // auipc
+    if (opcode == OP_AUIPC) { 
         write_back_source = 0b11; 
         write_back = imm + signals[pc_sig];
     }
-    else if (opcode == 55) { // lui
+    else if (opcode == OP_LUI) { 
         write_back_source = 0b01; 
         write_back = imm;
     }
@@ -437,9 +437,9 @@ void SignalChecker::check_u_type(uint32_t opcode, uint32_t rd, uint32_t imm) {
 
 void SignalChecker::check_s_type(uint32_t rs1, uint32_t rs2, uint32_t funct3, uint32_t imm) {
     uint32_t memory_write = 0b0;
-    if (funct3 == 0b000) memory_write = 0b01; // sb
-    else if (funct3 == 0b001) memory_write = 0b10; // sh
-    else if (funct3 == 0b010) memory_write = 0b11; // sw
+    if (funct3 == FUNCT3_SB) memory_write = 0b01; 
+    else if (funct3 == FUNCT3_SH) memory_write = 0b10; 
+    else if (funct3 == FUNCT3_SW) memory_write = 0b11; 
 
    signal_checks[pc_source_sig] = (signals[pc_source_sig] == 0b00) ? correct : incorrect;
    signal_checks[result_source_sig] = (signals[result_source_sig] == false)? correct : incorrect;
