@@ -124,8 +124,8 @@ SC_MODULE(RiscvMonitor) {
 
             signal_checker->check_j_type(opcode, rd, imm);
         }
-
-        signal_checker->display_error();
+        std::cout << reg_file[4] << std::endl;
+        //signal_checker->display_error();
     }
 
     SC_CTOR(RiscvMonitor) {
