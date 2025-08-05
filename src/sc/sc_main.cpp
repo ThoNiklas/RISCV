@@ -123,11 +123,10 @@ int sc_main(int argc, char** argv) {
 
     rst_sig.write(true);
     
-    sc_start(400, SC_NS);
+    sc_start(1000, SC_NS);
 
     sc_close_vcd_trace_file(trace_file);
 
-    std::cout << monitor.data_mem[0] << std::endl; 
 
     delete dut;
     return 0;
