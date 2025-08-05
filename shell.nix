@@ -1,5 +1,11 @@
-{ pkgs ? import <nixpkgs> {} }:
-  pkgs.mkShell {
-    # nativeBuildInputs is usually what you want -- tools you need to run
-    nativeBuildInputs = with pkgs.buildPackages; [ verilator gtkwave python3];
+{ pkgs ? (import <nixpkgs> {})}:
+
+pkgs.mkShell {
+  nativeBuildInputs = with pkgs.buildPackages; [
+    verilator
+    gtkwave
+    python3
+    pkgsCross.riscv32-embedded.buildPackages.gcc
+  ];
 }
+
