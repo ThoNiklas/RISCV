@@ -22,7 +22,8 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
     input logic clk_i, rst_i
 );
 
-    logic [RegBits-1:0] instr;
+    logic [RegBits-1:0] instr, instr_pre;
+    logic pc_plus_2;
     logic [RegBits-1:0] pc_next, pc;
     logic [RegBits-1:0] write_back, register_a, register_b;
     logic [RegBits-1:0] source_b, alu_result;
@@ -47,9 +48,12 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
                                                           .pc_o(pc)); 
 
     instruction_memory #(.RegBits(RegBits)) instruction_memory (.a_i(pc), 
-                                                                .rd_o(instr));
+                                                                .rd_o(instr_pre));
 
 
+    instruction_extender #(.RegBits(RegBits)) instruction_extender (.in_i(instr_pre),
+                                                                    .out_o(instr),
+                                                                    .pc_plus_2_o(pc_plus_2));
 
     register_file #(.RegBits(RegBits), .AddrBits(AddrBits)) register_file (.clk_i(clk_i), 
                                                                            .rst_i(rst_i), 
@@ -102,7 +106,7 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
 
     always_comb begin 
 
-        pc_plus_4 = pc + 4; // plus 4 bytes but plus 1 for next array entry
+        pc_plus_4 = pc_plus_2 ? pc + 2 : pc + 4; // plus 4 bytes but plus 1 for next array entry
         pc_target = pc + immediate_extended;
 
         case(pc_source)
