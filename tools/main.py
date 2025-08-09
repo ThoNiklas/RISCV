@@ -3,8 +3,18 @@ import sys
 
 from helpers import (
     b_types,
+    cb_types,
+    ci_types,
+    cj_types,
+    cl_types,
+    cr_types,
+    cs_types,
+    css_types,
     funct3s,
+    funct4s,
+    funct6s,
     funct7s,
+    functs,
     i_types,
     j_types,
     opcodes,
@@ -158,6 +168,121 @@ with open(input_file_path) as input_file:
                 + immediate[9]
                 + immediate[1:9]
                 + dec_to_bin(parameters[0], 5)
+                + opcodes[opcode]
+            )
+        elif opcode in cr_types:
+            rs2 = "00000"
+            if len(parameters) == 2:
+                rs2 = dec_to_bin(parameters[1], 5)
+            machine_code = (
+                funct4s[opcode] + dec_to_bin(parameters[0], 5) + rs2 + opcodes[opcode]
+            )
+        elif opcode in ci_types:
+            if opcode == "c.lwsp":
+                immediate = dec_to_bin(parameters[1], 8)
+                machine_code = (
+                    funct3s[opcode]
+                    + immediate[2]
+                    + dec_to_bin(parameters[0], 5)
+                    + immediate[3:6]
+                    + immediate[0:2]
+                    + opcodes[opcode]
+                )
+            elif opcode == "c.li" or opcode == "c.addi":
+                immediate = dec_to_bin(parameters[1], 6)
+                machine_code = (
+                    funct3s[opcode]
+                    + immediate[0]
+                    + dec_to_bin(parameters[0], 5)
+                    + immediate[1:6]
+                    + opcodes[opcode]
+                )
+            elif opcode == "c.lui":
+                immediate = dec_to_bin(parameters[1], 18)
+                machine_code = (
+                    funct3s[opcode]
+                    + immediate[0]
+                    + dec_to_bin(parameters[0], 5)
+                    + immediate[1:6]
+                    + opcodes[opcode]
+                )
+            elif opcode == "c.addi16sp":
+                immediate = dec_to_bin(parameters[0], 10)
+                machine_code = (
+                    funct3s[opcode]
+                    + immediate[0]
+                    + "00010"
+                    + immediate[5]
+                    + immediate[3]
+                    + immediate[1:3]
+                    + immediate[4]
+                    + opcodes[opcode]
+                )
+
+        elif opcode in css_types:
+            immediate = dec_to_bin(parameters[1], 8)
+            machine_code = (
+                funct3s[opcode]
+                + immediate[2:6]
+                + immediate[0:2]
+                + dec_to_bin(parameters[0], 5)
+                + opcodes[opcode]
+            )
+        elif opcode in cl_types:
+            immediate = dec_to_bin(parameters[2], 7)
+            machine_code = (
+                funct3s[opcode]
+                + immediate[1:4]
+                + dec_to_bin(parameters[1], 5)[2:5]
+                + immediate[4]
+                + immediate[0]
+                + dec_to_bin(parameters[0], 5)[2:5]
+                + opcodes[opcode]
+            )
+        elif opcode in cs_types:
+            if opcode == "c.sw":
+                immediate = dec_to_bin(parameters[2], 7)
+                machine_code = (
+                    funct3s[opcode]
+                    + immediate[1:4]
+                    + dec_to_bin(parameters[0])[2:5]
+                    + immediate[4]
+                    + immediate[0]
+                    + dec_to_bin(parameters[1], 5)[2:5]
+                    + opcodes[opcode]
+                )
+            else:
+                machine_code = (
+                    funct6s[opcode]
+                    + dec_to_bin(parameters[0], 5)[2:5]
+                    + functs[opcode]
+                    + dec_to_bin(parameters[1], 5)[2:5]
+                    + opcodes[opcode]
+                )
+        elif opcode in cb_types:
+            immediate = dec_to_bin(parameters[1], 9)
+            machine_code = (
+                funct3s[opcode]
+                + immediate[0]
+                + immediate[4:6]
+                + dec_to_bin(parameters[0], 5)[2:5]
+                + immediate[1:3]
+                + immediate[6:7]
+                + immediate[3]
+                + opcodes[opcode]
+            )
+        elif opcode in cj_types:
+            immediate = dec_to_bin(parameters[0], 12)
+            machine_code = (
+                funct3s[opcode]
+                + immediate[0]
+                + immediate[8]
+                + immediate[2:4]
+                + immediate[1]
+                + immediate[5]
+                + immediate[4]
+                + immediate[8:11]
+                + immediate[6]
                 + opcodes[opcode]
             )
         address = address + 4

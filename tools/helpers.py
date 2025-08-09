@@ -36,6 +36,32 @@ opcodes = {
     "bgeu": "1100011",
     "jalr": "1100111",
     "jal": "1101111",
+    "c.addi4spn": "00",
+    "c.lw": "00",
+    "c.sw": "00",
+    "c.nop": "01",
+    "c.addi": "01",
+    "c.jal": "01",
+    "c.li": "01",
+    "c.addi16sp": "01",
+    "c.lui": "01",
+    "c.srli": "01",
+    "c.srai": "01",
+    "c.andi": "01",
+    "c.sub": "01",
+    "c.xor": "01",
+    "c.or": "01",
+    "c.and": "01",
+    "c.j": "01",
+    "c.beqz": "01",
+    "c.bnez": "01",
+    "c.slli": "10",
+    "c.lwsp": "10",
+    "c.jr": "10",
+    "c.mv": "10",
+    "c.jalr": "10",
+    "c.add": "10",
+    "c.swsp": "10",
 }
 
 funct3s = {
@@ -73,6 +99,32 @@ funct3s = {
     "bltu": "110",
     "bgeu": "111",
     "jalr": "000",
+    "c.addi4spn": "000",
+    "c.lw": "010",
+    "c.sw": "110",
+    "c.nop": "000",
+    "c.addi": "000",
+    "c.jal": "001",
+    "c.li": "010",
+    "c.addi16sp": "011",
+    "c.lui": "011",
+    "c.srli": "100",
+    "c.srai": "100",
+    "c.andi": "100",
+    "c.sub": "100",
+    "c.xor": "100",
+    "c.or": "100",
+    "c.and": "100",
+    "c.j": "101",
+    "c.beqz": "110",
+    "c.bnez": "111",
+    "c.slli": "000",
+    "c.lwsp": "010",
+    "c.jr": "100",
+    "c.mv": "100",
+    "c.jalr": "100",
+    "c.add": "100",
+    "c.swsp": "110",
 }
 
 funct7s = {
@@ -89,6 +141,27 @@ funct7s = {
     "sra": "0100000",
     "or": "0000000",
     "and": "0000000",
+}
+
+funct4s = {
+    "c.jr": "1000",
+    "c.mv": "1000",
+    "c.jalr": "1001",
+    "c.add": "1001",
+}
+
+funct6s = {
+    "c.sub": "100011",
+    "c.xor": "100011",
+    "c.or": "100011",
+    "c.and": "100011",
+}
+
+functs = {
+    "c.sub": "00",
+    "c.xor": "01",
+    "c.or": "10",
+    "c.and": "11",
 }
 
 i_types = (
@@ -151,3 +224,39 @@ b_types = (
 )
 
 j_types = "jal"
+
+cr_types = (
+    "c.jr",
+    "c.jalr",
+    "c.mv",
+    "c.add",
+)
+ci_types = (
+    "c.lwsp",
+    "c.li",
+    "c.lui",
+    "c.addi",
+    "c.addi16sp",
+)
+
+css_types = "c.swsp"
+
+cl_types = "c.lw"
+
+cs_types = (
+    "c.sw",
+    "c.and",
+    "c.or",
+    "c.xor",
+    "c.sub",
+)
+
+cb_types = (
+    "c.beqz",
+    "c.bnez",
+)
+
+cj_types = (
+    "c.j",
+    "c.jal",
+)
