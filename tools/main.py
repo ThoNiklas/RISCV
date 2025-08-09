@@ -30,10 +30,14 @@ def catch_labels(file):
     address = 0
     with open(file) as input_file:
         for line in input_file:
-            line = line.split(":")
-            if len(line) == 2:
-                labels[line[0]] = address
-            address = address + 4
+            line_post = line.split(":")
+            if len(line_post) == 2:
+                labels[line_post[0]] = address
+            check = re.search(r"c\.", line)
+            if check:
+                address = address + 2
+            else:
+                address = address + 4
     print(labels)
 
 
