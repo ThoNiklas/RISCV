@@ -32,6 +32,8 @@ int sc_main(int argc, char** argv) {
     sc_signal<uint32_t> result_extended_sig;
     sc_signal<uint32_t> pc_plus_4_sig;
     sc_signal<uint32_t> pc_target_sig;
+    sc_signal<bool> pc_plus_2_sig;
+    sc_signal<uint32_t> instr_pre_sig;
 
     Vriscv* dut = new Vriscv{"dut"};
     dut->clk_i(clk);
@@ -60,6 +62,8 @@ int sc_main(int argc, char** argv) {
     dut->result_extended_o(result_extended_sig);
     dut->pc_plus_4_o(pc_plus_4_sig);
     dut->pc_target_o(pc_target_sig);
+    dut->pc_plus_2_o(pc_plus_2_sig);
+    dut->instr_pre_o(instr_pre_sig);
 
 
     RiscvMonitor monitor("monitor");
@@ -118,6 +122,8 @@ int sc_main(int argc, char** argv) {
     sc_trace(trace_file, result_extended_sig, "result_extended");
     sc_trace(trace_file, pc_plus_4_sig, "pc_plus_4");
     sc_trace(trace_file, pc_target_sig, "pc_target");
+    sc_trace(trace_file, pc_plus_2_sig, "pc_plus_2");
+    sc_trace(trace_file, instr_pre_sig, "instr_pre");
 
     sc_start(5, SC_NS);
 

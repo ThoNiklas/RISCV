@@ -15,7 +15,7 @@ module instruction_memory #(parameter RegBits=32)
 
     end
 
-    assign rd_o = {mem[a_i], mem[a_i+1], mem[a_i+2], mem[a_i+3]};
+    assign rd_o = {mem[a_i+3], mem[a_i+2], mem[a_i+1], mem[a_i]};
 
 endmodule
 

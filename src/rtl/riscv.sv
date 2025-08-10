@@ -2,8 +2,9 @@
 module riscv #(parameter RegBits=32, parameter AddrBits=5) 
 (
 `ifdef TB
-    output logic [RegBits-1:0] instr_o,
+    output logic [RegBits-1:0] instr_o, instr_pre_o,
     output logic [RegBits-1:0] pc_o, pc_next_o,
+    output logic pc_plus_2_o,
     output logic [RegBits-1:0] write_back_o, register_a_o, register_b_o,
     output logic [RegBits-1:0] source_b_o, alu_result_o,
     output logic [3:0] alu_control_o, onzc_o,
@@ -153,6 +154,8 @@ module riscv #(parameter RegBits=32, parameter AddrBits=5)
         reg_write_o = reg_write;
         alu_source_o = alu_source;
         result_source_o = result_source;
+        pc_plus_2_o = pc_plus_2;
+        instr_pre_o = instr_pre;
 `endif
 
         
