@@ -233,11 +233,11 @@ with open(input_file_path) as input_file:
                 + opcodes[opcode]
             )
         elif opcode in cl_types:
-            immediate = dec_to_bin(parameters[2], 7)
+            immediate = dec_to_bin(parameters[1], 7)
             machine_code = (
                 funct3s[opcode]
                 + immediate[1:4]
-                + dec_to_bin(parameters[1], 5)[2:5]
+                + dec_to_bin(parameters[2], 5)[2:5]
                 + immediate[4]
                 + immediate[0]
                 + dec_to_bin(parameters[0], 5)[2:5]
@@ -291,13 +291,13 @@ with open(input_file_path) as input_file:
             )
         address = address + 4
         output_file.write(
-            machine_code[0:8]
-            + " "
-            + machine_code[8:16]
+            machine_code[24:32]
             + " "
             + machine_code[16:24]
             + " "
-            + machine_code[24:32]
+            + machine_code[8:16]
+            + " "
+            + machine_code[0:8]
             + "\n"
         )
 
