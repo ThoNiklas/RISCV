@@ -33,6 +33,8 @@ typedef enum signal_names{
     result_extended_sig,
     pc_plus_4_sig,
     pc_target_sig,
+    pc_plus_2_sig,
+    instr_pre_sig,
     SIGNAL_CHECKERS_NR
 } signal_names;
 
@@ -63,7 +65,9 @@ class SignalChecker {
                   uint32_t result,
                   uint32_t result_extended,
                   uint32_t pc_plus_4,
-                  uint32_t pc_target);
+                  uint32_t pc_target,
+                  bool pc_plus_2,
+                  uint32_t instr_pre);
 
         void check_i_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uint32_t funct3, int32_t imm, uint32_t data);
         void check_r_type(uint32_t opcode, uint32_t rd, uint32_t rs1, uint32_t rs2, uint32_t funct3, uint32_t funct7);
@@ -71,6 +75,7 @@ class SignalChecker {
         void check_j_type(uint32_t opcode, uint32_t rd, uint32_t imm);
         void check_u_type(uint32_t opcode, uint32_t rd, uint32_t imm);
         void check_s_type(uint32_t rs1, uint32_t rs2, uint32_t funct3, uint32_t imm);
+        void check_compressed_instruction(uint32_t instr_pre, uint32_t instr);
         void display_error();
 
         int32_t signals[SIGNAL_CHECKERS_NR];

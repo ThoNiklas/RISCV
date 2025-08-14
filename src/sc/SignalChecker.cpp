@@ -30,6 +30,8 @@ std::string signal_checkers_names[SIGNAL_CHECKERS_NR] = {
     "result_extended_check",
     "pc_plus_4_check",
     "pc_target_check",
+    "pc_plus_2_check",
+    "instr_pre_check"
 };
 
 uint32_t SignalChecker::get_alu_control(uint32_t opcode, uint32_t funct3, uint32_t funct7) {
@@ -223,7 +225,9 @@ SignalChecker::SignalChecker(bool reg_write,
                   uint32_t result,
                   uint32_t result_extended,
                   uint32_t pc_plus_4,
-                  uint32_t pc_target) {
+                  uint32_t pc_target,
+                  bool pc_plus_2,
+                  uint32_t instr_pre) {
 
     signals[reg_write_sig] = reg_write;
     signals[alu_source_sig] = alu_source;
@@ -250,6 +254,8 @@ SignalChecker::SignalChecker(bool reg_write,
     signals[result_extended_sig] = result_extended;
     signals[pc_plus_4_sig] = pc_plus_4;
     signals[pc_target_sig] = pc_target;
+    signals[pc_plus_2_sig] = pc_plus_2;
+    signals[instr_pre_sig] = instr_pre;
 
     for (int i = 0; i < SIGNAL_CHECKERS_NR; i++) {
        signal_checks[i] = not_used; 
@@ -459,8 +465,28 @@ void SignalChecker::check_s_type(uint32_t rs1, uint32_t rs2, uint32_t funct3, ui
    signal_checks[pc_next_sig] = (signals[pc_next_sig] == signals[pc_plus_4_sig]) ? correct : incorrect;
 }
 
+void SignalChecker::check_compressed_instruction(uint32_t instr_pre, uint32_t instr) {
+    uint32_t quadrant = instr_pre & 0b11;
+    switch(quadrant) {
+        case (0b00): {
+            break;
+        }
+        case (0b01): {
+            break;
+        }
+        case (0b10): {
+            break;
+        }
+        case (0b11): {
+            signal_checks[instr_sig]  = (instr_pre == instr) ? correct : incorrect;
+            break;
+        }
+    }
+
+}
+
 void SignalChecker::display_error() {
-   if (is_correct()) cout << "Correct or unused" << endl;
+   if (is_correct()) return; //cout << "Correct or unused" << endl;
    else {
         cout << "Processor is incorrect in adress: " << signals[pc_sig] << endl;
         for (int i = 0; i < SIGNAL_CHECKERS_NR; i++) {

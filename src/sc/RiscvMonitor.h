@@ -8,8 +8,7 @@ SC_MODULE(RiscvMonitor) {
     sc_in<bool> clk;
     sc_in<bool> reg_write;
     sc_in<bool> alu_source;
-    sc_in<bool> result_source;
-    sc_in<bool> rst;
+    sc_in<bool> result_source; sc_in<bool> rst;
     sc_in<uint32_t> alu_control;
     sc_in<uint32_t> immediate_extended;
     sc_in<uint32_t> onzc;
@@ -31,6 +30,8 @@ SC_MODULE(RiscvMonitor) {
     sc_in<uint32_t> result_extended;
     sc_in<uint32_t> pc_plus_4;
     sc_in<uint32_t> pc_target;
+    sc_in<bool> pc_plus_2;
+    sc_in<uint32_t> instr_pre;
 
     int32_t reg_file[32];
     int32_t data_mem[1024];
@@ -63,8 +64,13 @@ SC_MODULE(RiscvMonitor) {
             result.read(),
             result_extended.read(),
             pc_plus_4.read(),
-            pc_target.read()
+            pc_target.read(),
+            pc_plus_2.read(),
+            instr_pre.read()
         );
+
+        signal_checker->check_compressed_instruction(instr_pre, instr);
+
         uint32_t opcode = instr & 0x7F;
         uint32_t rs1, rs2, rd, funct3, funct7;
         int32_t imm;
@@ -124,7 +130,7 @@ SC_MODULE(RiscvMonitor) {
 
             signal_checker->check_j_type(opcode, rd, imm);
         }
-        //signal_checker->display_error();
+        signal_checker->display_error();
     }
 
     SC_CTOR(RiscvMonitor) {

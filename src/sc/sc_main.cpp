@@ -93,6 +93,8 @@ int sc_main(int argc, char** argv) {
     monitor.result_extended(result_extended_sig);
     monitor.pc_plus_4(pc_plus_4_sig);
     monitor.pc_target(pc_target_sig);
+    monitor.pc_plus_2(pc_plus_2_sig);
+    monitor.instr_pre(instr_pre_sig);
 
     sc_trace_file* trace_file = sc_create_vcd_trace_file(argv[1]);
     trace_file->set_time_unit(1, sc_core::SC_NS);
