@@ -466,22 +466,112 @@ void SignalChecker::check_s_type(uint32_t rs1, uint32_t rs2, uint32_t funct3, ui
 }
 
 void SignalChecker::check_compressed_instruction(uint32_t instr_pre, uint32_t instr) {
+    if ((instr_pre & 0xFFFF) == 0) return;
+
+    uint32_t instr_ext;
     uint32_t quadrant = instr_pre & 0b11;
+    uint16_t funct3 = (instr_pre & (0x3 << 13))  >> 13;
+
+    uint32_t imm = 0;
+    uint32_t rd = 0;
+    uint32_t rs1 = 0;
+    uint32_t rs2 = 0;
+
     switch(quadrant) {
         case (0b00): {
+            switch(funct3) {
+                case(0b000): { // c.addi4spn
+                    rd = ((instr_pre & (0x7 << 2)) >> 2) | 0x8;
+                    imm = ((instr_pre & (0x3 << 11)) >> 7) | ((instr_pre & (0xF << 7)) >> 1) | ((instr_pre & (0x1 << 6)) >> 4) | ((instr_pre & (0x1 << 5)) >> 2);
+                    instr_ext = (imm << 20) | (0b00010 << 15) | (0b000 << 12) | (rd << 7) | (0b0010011);
+                    break; 
+                }
+                case(0b010): { // c.lw
+                    rd = ((instr_pre & (0x7 << 2)) >> 2) | 0x8;
+                    rs1 = ((instr_pre & (0x7 << 7)) >> 7) | 0x8;
+                    imm = ((instr_pre & (0x7 << 10)) >> 7) | ((instr_pre & (0x1 << 6)) >> 4) | ((instr_pre & (0x1 << 5)) >> 1);
+                    instr_ext = (imm << 20) | (rs1 << 15) | (0b010 << 12) | (rd << 7) | (0b0000011);
+                    break;
+                }
+                case(0b110): { // c.sw
+                    rs1 = ((instr_pre & (0x7 << 7)) >> 7) | 0x8;
+                    rs2 = ((instr_pre & (0x7 << 2)) >> 2) | 0x8;
+                    imm = ((instr_pre & (0x7 << 10)) >> 7) | ((instr_pre & (0x1 << 6)) >> 4) | ((instr_pre & (0x1 << 5)) >> 1);
+                    instr_ext = ((imm & 0xFE0) << 25) | (rs2 << 20) | (rs1 << 15) | (0b010 << 12) | ((imm & 0x1F) << 7) | (0b0100011);
+                    break;
+                }
+            }
             break;
         }
         case (0b01): {
+            switch(funct3) {
+                case(0b000): { // c.nop/addi
+                    if ((instr_pre & 0xF80) == 0) { // c.nop
+                        instr_ext = 0x33;
+                    } else { // c.addi
+                        rd = (instr_pre & (0x1F << 7)) >> 7;
+                        imm = ((instr_pre & (0x1 << 12)) >> 7) | ((instr_pre & (0x1F << 2)) >> 2);
+                        if ((imm & 0x20)) imm = imm | 0xFFFFFFC0;
+                        instr_ext = (imm << 20) | (rd << 15) | (0b000 << 12) | (rd << 7) | (0b0010011);
+                    }
+                    break;
+                }
+                case(0b001): { // c.jal
+                    break;
+                }
+                case(0b010): { // c.li
+                    break;
+                }
+                case(0b011): { // c.addi16sp/lui
+                    break;
+                }
+                case(0b100): { // c.srli/srai/andi/sub/xor/or/and
+                    break;
+                }
+                case(0b101): { // c.j
+                    break;
+                }
+                case(0b110): { // c.beqz
+                    break;
+                }
+                case(0b111): { // c.bnez
+                    break;
+                }
+            }
             break;
         }
         case (0b10): {
+            switch(funct3) {
+                case(0b000): { // c.slli
+                    rd = (instr_pre & (0x1F << 7)) >> 7;
+                    imm = (instr_pre & (0x1F << 2)) >> 2;
+                    instr_ext = (imm << 20) | (rd << 15) | (0b001 << 12) | (rd << 7) | (0b0010011);
+                    break;
+                }
+                case(0b010): { // c.lwsp
+                    rd = (instr_pre & (0x1F << 7)) >> 7;
+                    imm = ((instr_pre & (0x1 << 12)) >> 7) | ((instr_pre & (0x7 << 4)) >> 2) | ((instr_pre & (0x3 << 2)) << 4);
+                    instr_ext = (imm << 20) | (0b00010 << 15) | (0b010 << 12) | (rd << 7) | (0b0000011);
+                    break;
+                }
+                case(0b100): { // c.jr/mv/jalr/add
+                    break;
+                }
+                case(0b110): { // c.swsp
+                    rs2 = (instr_pre & (0x1F << 2)) >> 2;
+                    imm = ((instr_pre & (0xF << 9)) >> 7) | ((instr_pre & (0x3 << 7)) >> 1);
+                    instr_ext = ((imm & 0xFE0) << 25) | (rs2 << 20) | (0x00010 << 15) | (0b010 << 12) | ((imm & 0x1F) << 7) | (0b0100011);
+                    break;
+                }
+            }
             break;
         }
         case (0b11): {
-            signal_checks[instr_sig]  = (instr_pre == instr) ? correct : incorrect;
+            instr_ext = instr_pre;
             break;
         }
     }
+    signal_checks[instr_sig]  = (instr_ext == instr) ? correct : incorrect;
 
 }
 
