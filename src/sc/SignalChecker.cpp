@@ -517,9 +517,13 @@ void SignalChecker::check_compressed_instruction(uint32_t instr_pre, uint32_t in
                     break;
                 }
                 case(0b001): { // c.jal
+                    imm = (instr_pre & (0b1 << 12)) >> 1 | (instr_pre & (0b1 << 11)) >> 7 | (instr_pre & (0b11 << 9)) >> 1 | (instr_pre & (0b1 << 8)) << 2 | (instr_pre & (0b1 << 7)) >> 1 | (instr_pre & (0b111) << 3) >> 2 | (instr_pre & (0b1 << 2)) << 3;
+                    rd = 
+                    instr_ext = (imm & (0b1 << 20)) << 11 | (imm & (0x3FF << 1)) << 20 | (imm & (0b1 << 11)) << 9 | (imm & (0xFF << 12)) | (0b00001 << 7) | (0b1101111);
                     break;
                 }
                 case(0b010): { // c.li
+
                     break;
                 }
                 case(0b011): { // c.addi16sp/lui
@@ -567,7 +571,7 @@ void SignalChecker::check_compressed_instruction(uint32_t instr_pre, uint32_t in
                        if (instr_pre & (0b11111 << 2)) { // c.mv
                             instr_ext = (rs2 << 20) | (0b00000 << 15) | (0b000 << 12) | (rd << 7) | (0b0110011);
                         } else { // c.jr
-                            instr_ext = (rd << 15) | (0b000 << 12) | (0b00000 << 7) | (0b1100111);
+                            instr_ext = (rd << 15) | (0b000 << 12) | (0b00000 << 7) | (0b1100111)
                         }
                     }
                     break;
