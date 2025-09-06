@@ -468,7 +468,7 @@ void SignalChecker::check_s_type(uint32_t rs1, uint32_t rs2, uint32_t funct3, ui
 void SignalChecker::check_compressed_instruction(uint32_t instr_pre, uint32_t instr) {
     if ((instr_pre & 0xFFFF) == 0) return;
 
-    uint32_t instr_ext;
+    uint32_t instr_ext = 0;
     uint32_t quadrant = instr_pre & 0b11;
     uint16_t funct3 = (instr_pre & (0x3 << 13))  >> 13;
 
@@ -555,6 +555,21 @@ void SignalChecker::check_compressed_instruction(uint32_t instr_pre, uint32_t in
                     break;
                 }
                 case(0b100): { // c.jr/mv/jalr/add
+                    rd = (instr_pre & (0x1F << 7)) >> 7;
+                    rs2 = (instr_pre & (0x1F << 2)) >> 2;
+                    if (instr_pre & (0b1 << 12)) { //c.jalr/add
+                       if (instr_pre & (0b11111 << 2)) { // c.add
+                            instr_ext = (rs2 << 20) | (rd << 15) | (0b000 << 12) | (rd << 7) | (0b0110011);
+                       } else { // c.jalr
+                            instr_ext = (rd << 15) | (0b000 << 12) | (0b00001 << 7) | (0b1100111); 
+                       }
+                    } else { //c.jr/mv
+                       if (instr_pre & (0b11111 << 2)) { // c.mv
+                            instr_ext = (rs2 << 20) | (0b00000 << 15) | (0b000 << 12) | (rd << 7) | (0b0110011);
+                        } else { // c.jr
+                            instr_ext = (rd << 15) | (0b000 << 12) | (0b00000 << 7) | (0b1100111);
+                        }
+                    }
                     break;
                 }
                 case(0b110): { // c.swsp
